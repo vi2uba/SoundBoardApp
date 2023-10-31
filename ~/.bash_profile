@@ -1,0 +1,1 @@
+export ANDROID_SDK=Users/user/AppData/Local/Android/Sdk
