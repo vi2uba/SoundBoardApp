@@ -11,28 +11,16 @@ export default function App() {
     { name: 'Sound#4', key: '4', soundFile: require('./soundEffects/Yeah Boy.mp3') },
   ]);
 
+
   const [userButtons, setUserButtons] = useState([]);
-  const [newSoundName, setNewSoundName] = useState('');
-  const [newSoundFile, setNewSoundFile] = useState('');
+
+  
 
   const playSound = async (soundFile) => {
     const { sound } = await Audio.Sound.createAsync(soundFile);
     await sound.playAsync();
   };
 
-  const addUserSound = () => {
-    if (newSoundName && newSoundFile) {
-      // Add the user's sound to the userButtons state
-      setUserButtons([
-        ...userButtons,
-        { name: newSoundName, key: newSoundName, soundFile: newSoundFile },
-      ]);
-
-      // Clear the input fields
-      setNewSoundName('');
-      setNewSoundFile('');
-    }
-  };
 
   return (
     <View style={styles.container}>
@@ -47,19 +35,7 @@ export default function App() {
         )}
       />
 
-      {/* User input for adding sounds */}
-      <TextInput
-        placeholder="Sound Name"
-        value={newSoundName}
-        onChangeText={(text) => setNewSoundName(text)}
-      />
-      <TextInput
-        placeholder="Sound File (path or URL)"
-        value={newSoundFile}
-        onChangeText={(text) => setNewSoundFile(text)}
-      />
-      <Button title="Add Sound" onPress={addUserSound} />
-
+      
       <StatusBar style="auto" />
     </View>
   );
