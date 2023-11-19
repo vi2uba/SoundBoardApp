@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View, TextInput, Button } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Audio } from 'expo-av';
 
 export default function App() {
@@ -32,17 +32,21 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text>Soundboard App</Text>
-      <FlatList
-        numColumns={2}
-        data={[...predefinedButtons, ...userButtons]}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => playSound(item.soundFile)}>
-            <Text style={styles.custombutton}>{item.name}</Text>
-          </TouchableOpacity>
-        )}
-      />
+      <Text style={styles.title}>Soundboard App</Text>
 
+      <View style={styles.contentContainer}>
+        <View style={styles.buttonContainer}>
+          {[0, 1, 2].map(rowNumber => (
+            <View key={rowNumber} style={styles.rowContainer}>
+              {predefinedButtons.slice(rowNumber * 4, (rowNumber + 1) * 4).map((item) => (
+                <TouchableOpacity key={item.key} onPress={() => playSound(item.soundFile)}>
+                  <Text style={styles.custombutton}>{item.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ))}
+        </View>
+      </View>
       
       <StatusBar style="auto" />
     </View>
@@ -52,16 +56,49 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#5f9ea0',
     alignItems: 'center',
     justifyContent: 'center',
   },
+  title: {
+    marginTop: 20,
+    marginBottom: 50,
+    paddingHorizontal: 5,
+    paddingVertical: 8,
+    borderWidth: 2,
+    borderColor: '#20232a',
+    borderRadius: 8,
+    backgroundColor: '#f0f8ff',
+    color: '#20232a',
+    textAlign: 'center',
+    fontSize: 30,
+    fontWeight: 'bold',
+  },
+  contentContainer: {
+    flex: 1,
+    width: '100%',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    marginTop: 20,
+  },
   custombutton: {
     flex: 1,
-    backgroundColor: 'pink',
+    backgroundColor: '#f0e68c',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    padding: 25,
     margin: 5,
+    minWidth: '30%', // Adjust the width based on your preference
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-evenly',
+  },
+  rowContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    width: '100%',
+    marginBottom: 10,
   },
 });
