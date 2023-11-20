@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 25,
     margin: 5,
-    minWidth: '30%', // Adjust the width based on your preference
+    minWidth: '30%',
   },
   buttonContainer: {
     flexDirection: 'row',
