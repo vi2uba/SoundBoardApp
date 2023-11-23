@@ -32,9 +32,9 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text>Soundboard App</Text>
+      <Text style={styles.title}>Soundboard App</Text>
       <FlatList
-        numColumns={2}
+        numColumns={4}
         data={[...predefinedButtons, ...userButtons]}
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => playSound(item.soundFile)}>
@@ -61,7 +61,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'pink',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    padding: 10,
     margin: 5,
+  },
+  title: {
+    marginTop: 30,
+    fontSize: 20,
+    fontWeight: 'bold',
   },
 });
