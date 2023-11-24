@@ -1,7 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { useState } from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View, TextInput, Button } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { FlatList, StyleSheet, Text, TouchableOpacity, View, TextInput } from 'react-native';
 import { Audio } from 'expo-av';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function App() {
   const [predefinedButtons] = useState([
@@ -19,31 +20,76 @@ export default function App() {
     { name: 'Sound#12', key: '12', soundFile: require('./soundEffects/Just do it.mp3') }
   ]);
 
-
   const [userButtons, setUserButtons] = useState([]);
+  const [newSoundUri, setNewSoundUri] = useState(null);
 
-  
+  useEffect(() => {
+    (async () => {
+      if (Platform.OS !== 'web') {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          alert('Sorry, we need media library permissions to make this work!');
+        }
+      }
+    })();
+  }, []);
+
+  const pickSound = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Audio,
+      allowsEditing: false,
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      setNewSoundUri(result.uri);
+    }
+  };
 
   const playSound = async (soundFile) => {
-    const { sound } = await Audio.Sound.createAsync(soundFile);
+    const { sound } = await Audio.Sound.createAsync({ uri: soundFile });
     await sound.playAsync();
   };
 
+  const addCustomSound = () => {
+    if (newSoundUri) {
+      const newButton = {
+        name: `Sound#${userButtons.length + 1}`,
+        key: `${userButtons.length + 1}`,
+        soundFile: newSoundUri,
+      };
+
+      setUserButtons((prevButtons) => [...prevButtons, newButton]);
+      setNewSoundUri(null);
+    }
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Soundboard App</Text>
+      
+      <TouchableOpacity onPress={pickSound}>
+        <Text style={styles.addButton}>Pick Sound</Text>
+      </TouchableOpacity>
+
+      {newSoundUri && (
+        <Text style={styles.selectedSoundText}>Selected Sound: {newSoundUri}</Text>
+      )}
+
+      <TouchableOpacity onPress={addCustomSound}>
+        <Text style={styles.addButton}>Add Sound</Text>
+      </TouchableOpacity>
+
       <FlatList
         numColumns={4}
         data={[...predefinedButtons, ...userButtons]}
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => playSound(item.soundFile)}>
-            <Text style={styles.custombutton}>{item.name}</Text>
+            <Text style={styles.customButton}>{item.name}</Text>
           </TouchableOpacity>
         )}
       />
 
-      
       <StatusBar style="auto" />
     </View>
   );
@@ -56,7 +102,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  custombutton: {
+  customButton: {
     flex: 1,
     backgroundColor: 'pink',
     alignItems: 'center',
@@ -68,5 +114,15 @@ const styles = StyleSheet.create({
     marginTop: 30,
     fontSize: 20,
     fontWeight: 'bold',
+  },
+  addButton: {
+    backgroundColor: 'green',
+    padding: 10,
+    color: 'white',
+    marginVertical: 10,
+  },
+  selectedSoundText: {
+    fontSize: 16,
+    marginTop: 10,
   },
 });
