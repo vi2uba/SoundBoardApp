@@ -41,26 +41,34 @@ export default function App() {
   }, []);
 
   const pickSound = async () => {
-  let { status } = await MediaLibrary.requestPermissionsAsync();
-
-  if (status !== 'granted') {
-    alert('Sorry, we need media library permissions to make this work!');
-    return;
-  }
-
-  let result = await MediaLibrary.getMediaLibraryAsync({
-    mediaType: MediaLibrary.MediaType.audio,
-  });
-
-  if (!result.cancelled && result.items.length > 0) {
-    setSoundList(
-      result.items.map((item) => ({
-        label: item.filename,
-        value: item.uri,
-      }))
-    );
-  }
-};
+    let { status } = await MediaLibrary.requestPermissionsAsync();
+  
+    if (status !== 'granted') {
+      alert('Sorry, we need media library permissions to make this work!');
+      return;
+    }
+  
+    try {
+      let result = await MediaLibrary.getAssetsAsync({
+        mediaType: MediaLibrary.MediaType.audio,
+      });
+  
+      if (result && result.assets && result.assets.length > 0) {
+        setSoundList(
+          result.assets.map((asset) => ({
+            label: asset.filename,
+            value: asset.uri,
+          }))
+        );
+      } else {
+        alert('No audio assets found in the media library.');
+      }
+    } catch (error) {
+      console.error('Error fetching media library assets:', error);
+      alert('Error fetching media library assets. Please try again.');
+    }
+  };
+  
 
   
 
