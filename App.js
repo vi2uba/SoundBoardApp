@@ -1,8 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
 import React, { useState, useEffect } from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View, TextInput } from 'react-native';
+import {FlatList,StyleSheet,Text,TouchableOpacity,View,TextInput,} from 'react-native';
 import { Audio } from 'expo-av';
 import * as ImagePicker from 'expo-image-picker';
+import * as MediaLibrary from 'expo-media-library';
+import RNPickerSelect from 'react-native-picker-select';
 
 export default function App() {
   const [predefinedButtons] = useState([
@@ -22,34 +24,45 @@ export default function App() {
 
   const [userButtons, setUserButtons] = useState([]);
   const [newSoundUri, setNewSoundUri] = useState(null);
+  const [soundList, setSoundList] = useState([]);
 
   useEffect(() => {
     (async () => {
       if (Platform.OS !== 'web') {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        const { status } =
+          await ImagePicker.requestMediaLibraryPermissionsAsync();
         if (status !== 'granted') {
-          alert('Sorry, we need media library permissions to make this work!');
+          alert(
+            'Sorry, we need media library permissions to make this work!'
+          );
         }
       }
     })();
   }, []);
 
   const pickSound = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Audio,
-      allowsEditing: false,
-      quality: 1,
-    });
+  let { status } = await MediaLibrary.requestPermissionsAsync();
 
-    if (!result.cancelled) {
-      setNewSoundUri(result.uri);
-    }
-  };
+  if (status !== 'granted') {
+    alert('Sorry, we need media library permissions to make this work!');
+    return;
+  }
 
-  const playSound = async (soundFile) => {
-    const { sound } = await Audio.Sound.createAsync({ uri: soundFile });
-    await sound.playAsync();
-  };
+  let result = await MediaLibrary.getMediaLibraryAsync({
+    mediaType: MediaLibrary.MediaType.audio,
+  });
+
+  if (!result.cancelled && result.items.length > 0) {
+    setSoundList(
+      result.items.map((item) => ({
+        label: item.filename,
+        value: item.uri,
+      }))
+    );
+  }
+};
+
+  
 
   const addCustomSound = () => {
     if (newSoundUri) {
@@ -64,21 +77,35 @@ export default function App() {
     }
   };
 
+  const playSound = async (soundFile) => {
+    const { sound } = await Audio.Sound.createAsync({ uri: soundFile });
+    await sound.playAsync();
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Soundboard App</Text>
-      
+
       <TouchableOpacity onPress={pickSound}>
         <Text style={styles.addButton}>Pick Sound</Text>
       </TouchableOpacity>
 
       {newSoundUri && (
-        <Text style={styles.selectedSoundText}>Selected Sound: {newSoundUri}</Text>
+        <Text style={styles.selectedSoundText}>
+          Selected Sound: {newSoundUri}
+        </Text>
       )}
 
       <TouchableOpacity onPress={addCustomSound}>
         <Text style={styles.addButton}>Add Sound</Text>
       </TouchableOpacity>
+
+      <RNPickerSelect
+        onValueChange={(value) => setNewSoundUri(value)}
+        items={soundList}
+        placeholder={{ label: 'Select a sound', value: null }}
+        style={{ inputAndroid: styles.pickerInput }}
+      />
 
       <FlatList
         numColumns={4}
@@ -124,5 +151,10 @@ const styles = StyleSheet.create({
   selectedSoundText: {
     fontSize: 16,
     marginTop: 10,
+  },
+  pickerInput: {
+    backgroundColor: 'lightgray',
+    padding: 10,
+    marginVertical: 10,
   },
 });
