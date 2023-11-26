@@ -95,7 +95,7 @@ export default function App() {
       <Text style={styles.title}>Soundboard App</Text>
 
       <TouchableOpacity onPress={pickSound}>
-        <Text style={styles.addButton}>Pick Sound</Text>
+        <Text style={styles.addButton}>Open Downloads Folder</Text>
       </TouchableOpacity>
 
       {newSoundUri && (
