@@ -76,7 +76,7 @@ export default function App() {
   const addCustomSound = () => {
     if (newSoundUri) {
       const newButton = {
-        name: `Sound#${userButtons.length + 1}`,
+        name: `CustomSound#${userButtons.length + 1}`,
         key: `${userButtons.length + 1}`,
         soundFile: newSoundUri,
       };
