@@ -51,6 +51,7 @@ export default function App() {
     try {
       let result = await MediaLibrary.getAssetsAsync({
         mediaType: MediaLibrary.MediaType.audio,
+        first: 1500
       });
   
       if (result && result.assets && result.assets.length > 0) {
