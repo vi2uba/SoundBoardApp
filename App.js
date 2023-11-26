@@ -5,6 +5,7 @@ import { Audio } from 'expo-av';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
 import RNPickerSelect from 'react-native-picker-select';
+import ModalDropdown from 'react-native-modal-dropdown';
 
 export default function App() {
   const [predefinedButtons] = useState([
@@ -25,6 +26,7 @@ export default function App() {
   const [userButtons, setUserButtons] = useState([]);
   const [newSoundUri, setNewSoundUri] = useState(null);
   const [soundList, setSoundList] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -70,7 +72,7 @@ export default function App() {
     }
   };
   
-
+  const ITEM_HEIGHT = 50;
   
 
   const addCustomSound = () => {
@@ -91,6 +93,12 @@ export default function App() {
     await sound.playAsync();
   };
 
+  const filteredSoundList = soundList.filter(
+    (sound) =>
+      sound.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      sound.value.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Soundboard App</Text>
@@ -109,22 +117,36 @@ export default function App() {
         <Text style={styles.addButton}>Add Sound</Text>
       </TouchableOpacity>
 
-      <RNPickerSelect
-        onValueChange={(value) => setNewSoundUri(value)}
-        items={soundList}
-        placeholder={{ label: 'Select a sound', value: null }}
-        style={{ inputAndroid: styles.pickerInput }}
-      />
+      {/* Use ModalDropdown for the sound selection dropdown with an in-dropdown search bar */}
+      <ModalDropdown
+        options={filteredSoundList.map((sound) => sound.label)}
+        onSelect={(index, value) => setNewSoundUri(filteredSoundList[index].value)}
+        defaultValue="Select a sound"
+      >
+        <View style={styles.dropdownContainer}>
+          <TextInput
+            style={styles.dropdownInput}
+            placeholder="Search for a sound..."
+            onChangeText={(text) => setSearchQuery(text)}
+            value={searchQuery}
+          />
+        </View>
+      </ModalDropdown>
 
       <FlatList
-        numColumns={4}
-        data={[...predefinedButtons, ...userButtons]}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => playSound(item.soundFile)}>
-            <Text style={styles.customButton}>{item.name}</Text>
-          </TouchableOpacity>
-        )}
-      />
+  numColumns={4}
+  data={userButtons}
+  renderItem={({ item }) => (
+    <TouchableOpacity onPress={() => playSound(item.soundFile)}>
+      <Text style={styles.customButton}>{item.name}</Text>
+    </TouchableOpacity>
+  )}
+  getItemLayout={(data, index) => ({
+    length: ITEM_HEIGHT,
+    offset: ITEM_HEIGHT * index,
+    index,
+  })}
+/>
 
       <StatusBar style="auto" />
     </View>
@@ -137,14 +159,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  customButton: {
-    flex: 1,
-    backgroundColor: 'pink',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 10,
-    margin: 5,
   },
   title: {
     marginTop: 30,
@@ -161,9 +175,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 10,
   },
-  pickerInput: {
-    backgroundColor: 'lightgray',
+  customButton: {
+    flex: 1,
+    backgroundColor: 'pink',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 10,
+    margin: 5,
+  },
+  dropdownContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: 'gray',
     padding: 10,
     marginVertical: 10,
+    borderRadius: 5,
+  },
+  dropdownInput: {
+    flex: 1,
   },
 });
