@@ -9,10 +9,10 @@ import { Sound } from 'expo-av/build/Audio';
 
 export default function App() {
   const [predefinedButtons] = useState([
-    { name: 'Sound#1', key: '1', soundFile: require('./soundEffects/Hello There.mp3') },
+    { name: 'Sound#1', key: '1', soundFile: require('./soundEffects/HelloThere.mp3') },
     { name: 'Sound#2', key: '2', soundFile: require('./soundEffects/Homelander.mp3') },
-    { name: 'Sound#3', key: '3', soundFile: require('./soundEffects/Soldier boy.mp3') },
-    { name: 'Sound#4', key: '4', soundFile: require('./soundEffects/Yeah Boy.mp3') },
+    { name: 'Sound#3', key: '3', soundFile: require('./soundEffects/Soldierboy.mp3') },
+    { name: 'Sound#4', key: '4', soundFile: require('./soundEffects/YeahBoy.mp3') },
     { name: 'Sound#5', key: '5', soundFile: require('./soundEffects/2077SHITPOST.wav') },
     { name: 'Sound#6', key: '6', soundFile: require('./soundEffects/AshleyLook.mp3') },
     { name: 'Sound#7', key: '7', soundFile: require('./soundEffects/DogDoin.mp3') },
@@ -20,7 +20,7 @@ export default function App() {
     { name: 'Sound#9', key: '9', soundFile: require('./soundEffects/gae.mp3') },
     { name: 'Sound#10', key: '10', soundFile: require('./soundEffects/Jeff.mp3') },
     { name: 'Sound#11', key: '11', soundFile: require('./soundEffects/Jesus.mp3') },
-    { name: 'Sound#12', key: '12', soundFile: require('./soundEffects/Just do it.mp3') }
+    { name: 'Sound#12', key: '12', soundFile: require('./soundEffects/Justdoit.mp3') }
   ]);
 
   const [userButtons, setUserButtons] = useState([]);
