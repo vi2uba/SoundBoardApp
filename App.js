@@ -5,6 +5,7 @@ import { Audio } from 'expo-av';
 import * as ImagePicker from 'expo-image-picker';
 import * as MediaLibrary from 'expo-media-library';
 import RNPickerSelect from 'react-native-picker-select';
+import { Sound } from 'expo-av/build/Audio';
 
 export default function App() {
   const [predefinedButtons] = useState([
@@ -88,7 +89,22 @@ export default function App() {
 
   let currentSound = null;
 
-  const playSound = async (soundFile) => {
+  const playSoundPredfined = async (soundFile) => {
+    // If there is a currently playing sound, stop it
+    if (currentSound) {
+      await currentSound.stopAsync();
+      currentSound.unloadAsync(); // Unload the sound to free up resources
+    }
+  
+    // Load and play the new sound
+    const { sound } = await Audio.Sound.createAsync(soundFile);
+    await sound.playAsync();
+  
+    // Update the currentSound variable
+    currentSound = sound;
+  };
+
+  const playSoundCustom = async (soundFile) => {
     // If there is a currently playing sound, stop it
     if (currentSound) {
       await currentSound.stopAsync();
@@ -105,41 +121,59 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Soundboard App</Text>
-
+  
       <TouchableOpacity onPress={pickSound}>
         <Text style={styles.addButton}>Load Downloads Folder</Text>
       </TouchableOpacity>
-
+  
       {newSoundUri && (
         <Text style={styles.selectedSoundText}>
           Selected Sound: {newSoundUri}
         </Text>
       )}
-
+  
       <TouchableOpacity onPress={addCustomSound}>
         <Text style={styles.addButton}>Add Sound</Text>
       </TouchableOpacity>
-
+  
       <RNPickerSelect
         onValueChange={(value) => setNewSoundUri(value)}
         items={soundList}
         placeholder={{ label: 'Select a sound', value: null }}
         style={{ inputAndroid: styles.pickerInput }}
       />
-
+  
+      {/* Predefined Sounds FlatList */}
+      <Text style={styles.listTitle}>Predefined Sounds</Text>
       <FlatList
         numColumns={4}
-        data={[...predefinedButtons, ...userButtons]}
+        data={predefinedButtons}
         renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => playSound(item.soundFile)}>
+          <TouchableOpacity onPress={() => playSoundPredfined(item.soundFile)}>
             <Text style={styles.customButton}>{item.name}</Text>
           </TouchableOpacity>
         )}
+        keyExtractor={(item) => item.key}
       />
-
+  
+      {/* Custom Sounds FlatList */}
+      <Text style={styles.listTitle}>Custom Sounds</Text>
+      <FlatList
+        numColumns={4}
+        data={userButtons}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => playSoundCustom(item.soundFile)}>
+            <Text style={styles.customButton}>{item.name}</Text>
+          </TouchableOpacity>
+        )}
+        keyExtractor={(item) => item.key}
+      />
+  
       <StatusBar style="auto" />
     </View>
   );
+
+
 }
 
 const styles = StyleSheet.create({
